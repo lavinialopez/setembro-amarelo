@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setembro Amarelo - Bolhas da Empatia</title>
+    <!-- Google Fonts para um visual muito mais moderno -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://gstatic.com" crossorigin>
+    <link href="https://googleapis.com" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- SEÇÃO DO JOGO -->
+    <header>
+        <h1>Setembro Amarelo 💛</h1>
+        <p>Estoure as bolhas flutuantes clicando nelas e receba acolhimento em formato de mensagens inspiradoras.</p>
+        
+        <div class="header-controls">
+            <div class="score-container">
+                Mensagens lidas: <span id="score">0</span>
+            </div>
+            <button id="shareBtn" class="share-button">📢 Compartilhar Página</button>
+        </div>
+    </header>
+
+    <main class="game-container" id="gameContainer">
+        <!-- As bolhas serão geradas aqui via JS -->
+    </main>
+
+    <div class="scroll-indicator">
+        <p>Precisa desabafar de forma segura? Role para baixo ↓</p>
+    </div>
+
+    <!-- SEÇÃO DE DESABAFO -->
+    <section class="confession-section">
+        <h2>Espaço do Desabafo Anônimo 🔐</h2>
+        <p>Às vezes, colocar para fora ajuda a aliviar o peso do coração. Sinta-se inteiramente livre para escrever o que quiser. Este espaço é 100% anônimo, seguro e criptografado.</p>
+        
+        <form id="confessionForm">
+            <textarea id="confessionInput" placeholder="Escreva seu desabafo aqui com total segurança e privacidade..." required></textarea>
+            <button type="submit">Enviar Desabafo Anônimo</button>
+        </form>
+
+        <div class="mural-container">
+            <h3>Mural de Alívio Coletivo</h3>
+            <div id="mural">
+                <!-- Os desabafos do Firebase vão aparecer aqui em tempo real -->
+            </div>
+        </div>
+    </section>
+
+    <!-- MODAL PARA EXIBIR A MENSAGEM DA BOLHA -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content">
+            <div class="modal-emoji" id="modalEmoji">📚</div>
+            <p id="modalMessage">Sua mensagem aparecerá aqui!</p>
+            <button id="closeModal">Continuar</button>
+        </div>
+    </div>
+
+    <!-- Scripts Tradicionais do Firebase v8 (Funcionam perfeitamente abrindo localmente!) -->
+    <script src="https://gstatic.com"></script>
+    <script src="https://gstatic.com"></script>
+    <script src="script.js"></script>
+</body>
+</html>
