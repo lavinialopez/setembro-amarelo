@@ -1,18 +1,23 @@
 // CONFIGURE AQUI: Cole aqui exatamente os dados que copiou do console do seu Firebase!
 const firebaseConfig = {
-    apiKey: "AIzaSyCBTE3NoUAMKC8jNIaGF5dCcdWL8kBcFIo",
-    authDomain: "setembro-amarelo-jogo.firebaseapp.com",
-    databaseURL: "https://setembro-amarelo-jogo-default-rtdb.firebaseio.com",
-    projectId: "setembro-amarelo-jogo",
-    storageBucket: "setembro-amarelo-jogo.firebasestorage.app",
-    messagingSenderId: "453358676727",
-    appId: "1:453358676727:web:037dc6a5cef96327d1c1f2",
-    measurementId: "G-KY2ETBHZ83"
-  };
+  apiKey: "AIzaSyCBTE3NoUAMKC8jNIaGF5dCcdWL8kBcFIo",
+  authDomain: "setembro-amarelo-jogo.firebaseapp.com",
+  databaseURL: "https://setembro-amarelo-jogo-default-rtdb.firebaseio.com",
+  projectId: "setembro-amarelo-jogo",
+  storageBucket: "setembro-amarelo-jogo.firebasestorage.app",
+  messagingSenderId: "453358676727",
+  appId: "1:453358676727:web:037dc6a5cef96327d1c1f2",
+  measurementId: "G-KY2ETBHZ83"
+};
 
-// Inicializando o Firebase com a sintaxe clássica e segura para testes locais
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+// Inicializando o Firebase de forma segura e global
+let db = null;
+try {
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.firestore();
+} catch (error) {
+    console.error("Erro ao inicializar o Firebase:", error);
+}
 
 // Mensagens Motivacionais das Bolhas
 const mensagens = [
@@ -50,6 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function createBubble() {
+    if (!gameContainer) return;
     const bubble = document.createElement('div');
     bubble.classList.add('bubble');
     
@@ -121,7 +127,7 @@ shareBtn.addEventListener('click', async () => {
     }
 });
 
-// --- OPERAÇÕES NO FIREBASE ---
+// --- OPERAÇÕES NO BANCO DE DADOS (FIREBASE REAL) ---
 const confessionForm = document.getElementById('confessionForm');
 const confessionInput = document.getElementById('confessionInput');
 const mural = document.getElementById('mural');
@@ -135,14 +141,15 @@ confessionForm.addEventListener('submit', async (e) => {
         confessionInput.value = ""; 
         
         try {
-            // Salvando usando a biblioteca v8 estável localmente
-            await db.collection("desabafos").add({
-                texto: texto,
-                criadoEm: firebase.firestore.FieldValue.serverTimestamp()
-            });
+            if (db) {
+                await db.collection("desabafos").add({
+                    texto: texto,
+                    criadoEm: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            }
         } catch (error) {
             console.error("Erro ao enviar para o Firebase: ", error);
-            alert("Não foi possível enviar o desabafo agora. Verifique a internet.");
+            alert("Não foi possível enviar o desabafo agora.");
         }
     }
 });
@@ -156,8 +163,10 @@ function filtrarTexto(texto) {
     return textoFiltrado;
 }
 
-// Sincronização estável e em tempo real com o banco de dados
+// Ouvinte em tempo real para conectar todos os computadores do mundo
 function escutarMuralFirebase() {
+    if (!db) return;
+    
     db.collection("desabafos").orderBy("criadoEm", "desc").onSnapshot((snapshot) => {
         mural.innerHTML = ""; 
         
@@ -180,5 +189,6 @@ function escutarMuralFirebase() {
         });
     }, (error) => {
         console.error("Erro ao ler dados do Firebase: ", error);
+        mural.innerHTML = `<div class="card-desabafo" style="color: red;">Configure as regras públicas no seu painel do Firebase para que as mensagens apareçam aqui!</div>`;
     });
 }
