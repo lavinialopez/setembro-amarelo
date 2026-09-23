@@ -1,8 +1,4 @@
-// Importando o Firebase moderno via CDN oficial HTTPS (Essencial para o GitHub Pages)
-import { initializeApp } from "https://gstatic.com";
-import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://gstatic.com";
-
-// 🔑 COLOQUE SUAS CREDENCIAIS DO FIREBASE AQUI DENTRO:
+// 🔑 PREENCHA AQUI: Insira os dados corretos gerados no seu Console do Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyCBTE3NoUAMKC8jNIaGF5dCcdWL8kBcFIo",
   authDomain: "setembro-amarelo-jogo.firebaseapp.com",
@@ -17,19 +13,21 @@ const firebaseConfig = {
 let db = null;
 let firebaseAtivo = false;
 
-// Inicialização blindada contra erros
+// Inicialização segura que garante o funcionamento das bolhas mesmo se as chaves falharem
 try {
-    if (firebaseConfig.apiKey && firebaseConfig.apiKey !== "SUA_API_KEY") {
-        const app = initializeApp(firebaseConfig);
-        db = getFirestore(app);
+    if (typeof firebase !== 'undefined' && firebaseConfig.apiKey && firebaseConfig.apiKey !== "SUA_API_KEY") {
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.firestore();
         firebaseAtivo = true;
         console.log("Firebase conectado com sucesso!");
+    } else {
+        console.log("Rodando no Modo de Segurança Local (Sem Firebase configurado).");
     }
 } catch (error) {
-    console.error("Falha ao conectar com o Firebase. Rodando no modo de segurança local.", error);
+    console.error("Falha silenciosa ao conectar com o banco. Ativando modo local autônomo.", error);
 }
 
-// Banco de dados de mensagens
+// Banco de dados de frases motivacionais
 const mensagens = [
     { text: "Seu esforço nos estudos vai valer a pena. Cada passo conta!", emoji: "📚" },
     { text: "Cuidar da sua mente é um ato de coragem. Você não está sozinho.", emoji: "🧠" },
@@ -59,10 +57,10 @@ const modalMessage = document.getElementById('modalMessage');
 const closeModalBtn = document.getElementById('closeModal');
 const shareBtn = document.getElementById('shareBtn');
 
-// Inicializar tudo ao carregar a página
+// Inicializar elementos da interface
 document.addEventListener("DOMContentLoaded", () => {
     carregarMural();
-    setInterval(createBubble, 1200); // Cria bolhas sem parar
+    setInterval(createBubble, 1200); // Executa o nascimento das bolhas sem interrupções
 });
 
 function createBubble() {
@@ -138,7 +136,7 @@ shareBtn.addEventListener('click', async () => {
     }
 });
 
-// --- LÓGICA DO MURAL HÍBRIDO ---
+// --- CONTROLE DE MURAL SEGURO E COLETIVO ---
 const confessionForm = document.getElementById('confessionForm');
 const confessionInput = document.getElementById('confessionInput');
 const mural = document.getElementById('mural');
@@ -152,21 +150,21 @@ if (confessionForm) {
             texto = filtrarTexto(texto);
             confessionInput.value = ""; 
             
-            // Salva na memória do navegador primeiro (Garante feedback visual imediato)
+            // Grava e exibe no navegador local imediatamente
             let desabafosLocais = JSON.parse(localStorage.getItem('backup_desabafos')) || [];
             desabafosLocais.unshift(texto);
             localStorage.setItem('backup_desabafos', JSON.stringify(desabafosLocais));
             renderizarMural(desabafosLocais);
             
-            // Envia para o Firebase global se ele estiver conectado
+            // Envia em background para a nuvem global se o Firebase estiver operacional
             if (firebaseAtivo && db) {
                 try {
-                    await addDoc(collection(db, "desabafos"), {
+                    await db.collection("desabafos").add({
                         texto: texto,
-                        criadoEm: serverTimestamp()
+                        criadoEm: firebase.firestore.FieldValue.serverTimestamp()
                     });
                 } catch (error) {
-                    console.error("Erro ao enviar para o Firebase:", error);
+                    console.error("Erro ao transmitir para a nuvem:", error);
                 }
             }
         }
@@ -194,10 +192,9 @@ function carregarMural() {
     
     renderizarMural(locais);
 
-    // Se o Firebase estiver ativo, ele passa a escutar a nuvem em tempo real
+    // Escuta ativa do Firebase clássico v8
     if (firebaseAtivo && db) {
-        const q = query(collection(db, "desabafos"), orderBy("criadoEm", "desc"));
-        onSnapshot(q, (snapshot) => {
+        db.collection("desabafos").orderBy("criadoEm", "desc").onSnapshot((snapshot) => {
             let globais = [];
             snapshot.forEach((doc) => {
                 const dados = doc.data();
@@ -205,12 +202,11 @@ function carregarMural() {
             });
             
             if (globais.length > 0) {
-                // Junta as mensagens sem duplicar
                 let unificados = [...new Set([...locais, ...globais])];
                 renderizarMural(unificados);
             }
         }, (error) => {
-            console.error("Erro no fluxo do Firebase:", error);
+            console.error("Erro de sincronização externa:", error);
         });
     }
 }
