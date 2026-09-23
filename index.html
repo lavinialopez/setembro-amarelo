@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Setembro Amarelo - Bolhas da Empatia</title>
-    <!-- Google Fonts para um visual muito mais moderno -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <!-- Google Fonts para um visual moderno -->
+    <link rel="preconnect" href="https://googleapis.com">
     <link rel="preconnect" href="https://gstatic.com" crossorigin>
-    <link href="https://googleapis.com" rel="stylesheet">
+    <link href="https://googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -46,7 +46,7 @@
         <div class="mural-container">
             <h3>Mural de Alívio Coletivo</h3>
             <div id="mural">
-                <!-- Os desabafos do Firebase vão aparecer aqui em tempo real -->
+                <!-- Os desabafos vão aparecer aqui -->
             </div>
         </div>
     </section>
@@ -60,9 +60,7 @@
         </div>
     </div>
 
-    <!-- Scripts Tradicionais do Firebase v8 (Funcionam perfeitamente abrindo localmente!) -->
-    <script src="https://gstatic.com"></script>
-    <script src="https://gstatic.com"></script>
-    <script src="script.js"></script>
+    <!-- Chamada moderna do script como módulo (Evita bloqueios no GitHub Pages) -->
+    <script type="module" src="script.js"></script>
 </body>
 </html>
