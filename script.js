@@ -2,7 +2,7 @@
 import { initializeApp } from "https://gstatic.com";
 import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://gstatic.com";
 
-// Credenciais oficiais do seu projeto Firebase
+// Suas credenciais reais obtidas no console do seu Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyCBTE3NoUAMKC8jNIaGF5dCcdWL8kBcFIo",
   authDomain: "setembro-amarelo-jogo.firebaseapp.com",
@@ -101,6 +101,7 @@ function createBurstAnimation(x, y) {
     }
 }
 
+// Abre o Modal com a Mensagem
 function estourarBolha(data) {
     score++;
     scoreDisplay.innerText = score;
@@ -149,7 +150,6 @@ if (confessionForm) {
                 });
             } catch (error) {
                 console.error("Erro ao enviar para o Firebase: ", error);
-                alert("O banco recusou o envio. Verifique se as Regras de Segurança no Cloud Firestore estão como true.");
             }
         }
     });
