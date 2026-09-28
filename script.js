@@ -1,13 +1,13 @@
 // CONFIGURE AQUI: Credenciais oficiais obtidas no console do seu Firebase
 const firebaseConfig = {
-    apiKey: "AIzaSyCBTE3NoUAMKC8jNIaGF5dCcdwL8kBcFIO",
-    authDomain: "://firebaseapp.com",
-    databaseURL: "https://firebaseio.com",
-    projectId: "setembro-amarelo-jogo",
-    storageBucket: "setembro-amarelo-jogo.firebasestorage.app",
-    messagingSenderId: "453358676727",
-    appId: "1:453358676727:web:037dc6a5cef96327d1c1f2",
-    measurementId: "G-KY2ETBHZ83"
+  apiKey: "AIzaSyCBTE3NoUAMKC8jNIaGF5dCcdWL8kBcFIo",
+  authDomain: "setembro-amarelo-jogo.firebaseapp.com",
+  databaseURL: "https://setembro-amarelo-jogo-default-rtdb.firebaseio.com",
+  projectId: "setembro-amarelo-jogo",
+  storageBucket: "setembro-amarelo-jogo.firebasestorage.app",
+  messagingSenderId: "453358676727",
+  appId: "1:453358676727:web:037dc6a5cef96327d1c1f2",
+  measurementId: "G-KY2ETBHZ83"
 };
 
 // Inicialização direta e forçada (Garante o funcionamento na nuvem)
