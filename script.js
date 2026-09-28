@@ -1,4 +1,4 @@
-// Importação modular moderna do Firebase (Blindado contra erros de carregamento no HTML)
+// Importações com as URLs completas e corrigidas (Sem erros de CORS no GitHub Pages)
 import { initializeApp } from "https://gstatic.com";
 import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://gstatic.com";
 
