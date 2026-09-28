@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Setembro Amarelo - Bolhas da Empatia</title>
-    <!-- Google Fonts para tipografia premium -->
     <link rel="preconnect" href="https://googleapis.com">
     <link rel="preconnect" href="https://gstatic.com" crossorigin>
     <link href="https://googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700&display=swap" rel="stylesheet">
@@ -39,7 +38,7 @@
         <p>Às vezes, colocar para fora ajuda a aliviar o peso do coração. Sinta-se inteiramente livre para escrever o que quiser. Este espaço é 100% anônimo, seguro e criptografado.</p>
         
         <form id="confessionForm">
-            <textarea id="confessionInput" placeholder="Escreva seu desabafo aqui com total segurança e privacidade..." required></textarea>
+            <textarea id="confessionInput" placeholder="Escreva seu desabafo aqui com total segurança..."></textarea>
             <button type="submit">Enviar Desabafo Anônimo</button>
         </form>
 
@@ -60,11 +59,7 @@
         </div>
     </div>
 
-    <!-- CDN Clássico do Firebase (Garante compatibilidade total com o script atual) -->
-    <script src="https://gstatic.com"></script>
-    <script src="https://gstatic.com"></script>
-    
-    <!-- Chamada padrão do seu script correto -->
-    <script src="script.js"></script>
+    <!-- Chamada como módulo para o Firebase Moderno -->
+    <script type="module" src="script.js"></script>
 </body>
 </html>
