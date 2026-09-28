@@ -1,20 +1,20 @@
-// Importações com as URLs completas e corrigidas (Sem erros de CORS no GitHub Pages)
+// URLs oficiais e completas corrigidas contra erros de CORS
 import { initializeApp } from "https://gstatic.com";
 import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://gstatic.com";
 
-// Suas credenciais reais obtidas no console do seu Firebase
+// SUAS CREDENCIAIS OFICIAIS ATIVADAS
 const firebaseConfig = {
-  apiKey: "AIzaSyCBTE3NoUAMKC8jNIaGF5dCcdWL8kBcFIo",
-  authDomain: "setembro-amarelo-jogo.firebaseapp.com",
-  databaseURL: "https://setembro-amarelo-jogo-default-rtdb.firebaseio.com",
-  projectId: "setembro-amarelo-jogo",
-  storageBucket: "setembro-amarelo-jogo.firebasestorage.app",
-  messagingSenderId: "453358676727",
-  appId: "1:453358676727:web:037dc6a5cef96327d1c1f2",
-  measurementId: "G-KY2ETBHZ83"
+    apiKey: "AIzaSyCBTE3NoUAMKC8jNIaGF5dCcdWL8kBcFIo",
+    authDomain: "setembro-amarelo-jogo.firebaseapp.com",
+    databaseURL: "https://setembro-amarelo-jogo-default-rtdb.firebaseio.com",
+    projectId: "setembro-amarelo-jogo",
+    storageBucket: "setembro-amarelo-jogo.firebasestorage.app",
+    messagingSenderId: "453358676727",
+    appId: "1:453358676727:web:037dc6a5cef96327d1c1f2",
+    measurementId: "G-KY2ETBHZ83"
 };
 
-// Inicialização direta do Banco de Dados
+// Inicialização direta do Cloud Firestore
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
@@ -101,7 +101,6 @@ function createBurstAnimation(x, y) {
     }
 }
 
-// Abre o Modal com a Mensagem
 function estourarBolha(data) {
     score++;
     scoreDisplay.innerText = score;
@@ -112,7 +111,6 @@ function estourarBolha(data) {
 
 closeModalBtn.addEventListener('click', () => { modalOverlay.style.display = 'none'; });
 
-// Sistema de Compartilhamento
 shareBtn.addEventListener('click', async () => {
     if (navigator.share) {
         try {
@@ -128,7 +126,7 @@ shareBtn.addEventListener('click', async () => {
     }
 });
 
-// --- OPERAÇÕES NO FIREBASE (MÓDULO v10) ---
+// --- OPERAÇÕES NO FIREBASE ---
 const confessionForm = document.getElementById('confessionForm');
 const confessionInput = document.getElementById('confessionInput');
 const mural = document.getElementById('mural');
@@ -143,7 +141,6 @@ if (confessionForm) {
             confessionInput.value = ""; 
             
             try {
-                // Salvando na coleção "desabafos" na nuvem
                 await addDoc(collection(db, "desabafos"), {
                     texto: texto,
                     criadoEm: serverTimestamp()
@@ -164,7 +161,6 @@ function filtrarTexto(texto) {
     return textoFiltrado;
 }
 
-// Escuta em tempo real as mensagens globais de todos os computadores
 function escutarMuralFirebase() {
     const q = query(collection(db, "desabafos"), orderBy("criadoEm", "desc"));
     
