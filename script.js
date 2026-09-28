@@ -1,7 +1,7 @@
 // CONFIGURE AQUI: Credenciais oficiais obtidas no console do seu Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyCBTE3NoUAMKC8jNIaGF5dCcdwL8kBcFIO",
-    authDomain: "://firebaseapp.com",
+    authDomain: "setembro-amarelo-jogo.firebaseapp.com",
     databaseURL: "https://firebaseio.com",
     projectId: "setembro-amarelo-jogo",
     storageBucket: "setembro-amarelo-jogo.firebasestorage.app",
@@ -15,7 +15,6 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 let firebaseAtivo = true;
 console.log("Firebase forçado com sucesso!");
-
 
 // Banco de dados de mensagens das bolhas
 const mensagens = [
@@ -36,7 +35,7 @@ const mensagens = [
     { text: "Um dia ruim não significa uma vida ruim. Dias melhores estão vindo.", emoji: "🌤️" }
 ];
 
-const palavrasProibidas = ["palavrao1", "palavrao2"];
+const palavrasProibidas = ["palavrao1", "palavrao2", "ofensa1", "ofensa2"];
 
 let score = 0;
 const gameContainer = document.getElementById('gameContainer');
@@ -47,29 +46,36 @@ const modalMessage = document.getElementById('modalMessage');
 const closeModalBtn = document.getElementById('closeModal');
 const shareBtn = document.getElementById('shareBtn');
 
+// Inicializar elementos da interface
 document.addEventListener("DOMContentLoaded", () => {
-    escutarMuralFirebase();
-    setInterval(createBubble, 1200);
+    carregarMural();
+    setInterval(createBubble, 1200); // Executa o nascimento das bolhas sem interrupções
 });
 
 function createBubble() {
     if (!gameContainer) return;
     const bubble = document.createElement('div');
     bubble.classList.add('bubble');
+    
     const dataAleatoria = mensagens[Math.floor(Math.random() * mensagens.length)];
     bubble.innerText = dataAleatoria.emoji;
+    
     const size = Math.random() * 20 + 55;
     const posX = Math.random() * (window.innerWidth - size - 40);
+    
     bubble.style.width = `${size}px`;
     bubble.style.height = `${size}px`;
     bubble.style.left = `${posX}px`;
+    
     const duration = Math.random() * 3 + 5;
     bubble.style.animationDuration = `${duration}s`;
+    
     bubble.addEventListener('click', (e) => {
         createBurstAnimation(e.clientX, e.clientY);
         estourarBolha(dataAleatoria);
         bubble.remove();
     });
+    
     gameContainer.appendChild(bubble);
     setTimeout(() => { bubble.remove(); }, duration * 1000);
 }
@@ -103,6 +109,7 @@ function estourarBolha(data) {
 
 closeModalBtn.addEventListener('click', () => { modalOverlay.style.display = 'none'; });
 
+// Sistema de Compartilhamento
 shareBtn.addEventListener('click', async () => {
     if (navigator.share) {
         try {
@@ -111,14 +118,14 @@ shareBtn.addEventListener('click', async () => {
                 text: 'Entre nessa página para estourar bolhas motivacionais e aliviar o coração desabafando de forma anônima. 💛',
                 url: window.location.href
             });
-        } catch (err) { console.log("Cancelado."); }
+        } catch (err) { console.log("Compartilhamento cancelado."); }
     } else {
         navigator.clipboard.writeText(window.location.href);
-        alert("Link copiado! 💛");
+        alert("Link da página copiado! Envie para seus amigos. 💛");
     }
 });
 
-// --- OPERAÇÕES DO MURAL ---
+// --- CONTROLE DE MURAL SEGURO E COLETIVO ---
 const confessionForm = document.getElementById('confessionForm');
 const confessionInput = document.getElementById('confessionInput');
 const mural = document.getElementById('mural');
@@ -132,20 +139,22 @@ if (confessionForm) {
             texto = filtrarTexto(texto);
             confessionInput.value = ""; 
             
+            // Grava e exibe no navegador local imediatamente
+            let desabafosLocais = JSON.parse(localStorage.getItem('backup_desabafos')) || [];
+            desabafosLocais.unshift(texto);
+            localStorage.setItem('backup_desabafos', JSON.stringify(desabafosLocais));
+            renderizarMural(desabafosLocais);
+            
+            // Envia em background para a nuvem global se o Firebase estiver operacional
             if (firebaseAtivo && db) {
                 try {
-                    // Envia para o banco de dados global
                     await db.collection("desabafos").add({
                         texto: texto,
                         criadoEm: firebase.firestore.FieldValue.serverTimestamp()
                     });
-                    console.log("Mensagem salva na nuvem!");
                 } catch (error) {
-                    console.error("Erro ao enviar:", error);
-                    alert("Erro de Permissão: O Firebase bloqueou o envio. Verifique as Regras de Segurança no painel.");
+                    console.error("Erro ao transmitir para a nuvem:", error);
                 }
-            } else {
-                alert("Erro: O Firebase não está configurado corretamente com suas chaves no topo do script.js");
             }
         }
     });
@@ -160,40 +169,44 @@ function filtrarTexto(texto) {
     return textoFiltrado;
 }
 
-// Sincronização global em tempo real
-function escutarMuralFirebase() {
-    if (!firebaseAtivo || !db) {
-        mural.innerHTML = `<div class="card-desabafo" style="color: #b45309; font-weight: bold;">⚠️ Modo Local: Insira as chaves do Firebase no início do seu arquivo script.js para conectar os computadores.</div>`;
-        return;
+function carregarMural() {
+    let locais = JSON.parse(localStorage.getItem('backup_desabafos')) || [];
+    
+    if (locais.length === 0) {
+        locais = [
+            "Às vezes sinto que a pressão dos estudos é demais para mim, mas estou tentando ir com calma.",
+            "Guardar as coisas só para mim estava me sufocando. Deixar esse recado aqui me deu um pequeno alívio."
+        ];
     }
     
-    db.collection("desabafos").orderBy("criadoEm", "desc").onSnapshot((snapshot) => {
-        mural.innerHTML = ""; 
-        
-        if (snapshot.empty) {
-            mural.innerHTML = `
-                <div class="card-desabafo">"Mural conectado à nuvem! Seja o primeiro a deixar um desabafo anônimo global..."</div>
-            `;
-            return;
-        }
+    renderizarMural(locais);
 
-        snapshot.forEach((doc) => {
-            const dados = doc.data();
-            if (dados.texto) {
-                const card = document.createElement('div');
-                card.classList.add('card-desabafo');
-                card.innerText = `"${dados.texto}"`;
-                mural.appendChild(card);
+    // Escuta ativa do Firebase clássico v8
+    if (firebaseAtivo && db) {
+        db.collection("desabafos").orderBy("criadoEm", "desc").onSnapshot((snapshot) => {
+            let globais = [];
+            snapshot.forEach((doc) => {
+                const dados = doc.data();
+                if (dados.texto) globais.push(dados.texto);
+            });
+            
+            if (globais.length > 0) {
+                let unificados = [...new Set([...locais, ...globais])];
+                renderizarMural(unificados);
             }
+        }, (error) => {
+            console.error("Erro de sincronização externa:", error);
         });
-    }, (error) => {
-        console.error("Erro no Firebase:", error);
-        mural.innerHTML = `
-            <div class="card-desabafo" style="color: #dc2626; font-weight: bold; border-left-color: #dc2626;">
-                ❌ Erro de Permissão do Firebase (Falta liberar as Regras)<br>
-                <span style="font-size: 0.85rem; font-weight: normal; font-style: normal; color: #451a03;">
-                    O seu site conectou ao Firebase, mas o banco recusou o acesso. Vá no painel do seu <b>Cloud Firestore</b> > aba <b>Regras</b>, apague o que está lá, cole o código de liberação e clique em <b>Publicar</b>.
-                </span>
-            </div>`;
+    }
+}
+
+function renderizarMural(lista) {
+    if (!mural) return;
+    mural.innerHTML = "";
+    lista.forEach(texto => {
+        const card = document.createElement('div');
+        card.classList.add('card-desabafo');
+        card.innerText = `"${texto}"`;
+        mural.appendChild(card);
     });
 }
