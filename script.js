@@ -1,29 +1,20 @@
-// COLOQUE SUAS CREDENCIAIS DO FIREBASE AQUI DENTRO:
 const firebaseConfig = {
-  apiKey: "AIzaSyCBTE3NoUAMKC8jNIaGF5dCcdWL8kBcFIo",
-  authDomain: "setembro-amarelo-jogo.firebaseapp.com",
-  databaseURL: "https://setembro-amarelo-jogo-default-rtdb.firebaseio.com",
-  projectId: "setembro-amarelo-jogo",
-  storageBucket: "setembro-amarelo-jogo.firebasestorage.app",
-  messagingSenderId: "453358676727",
-  appId: "1:453358676727:web:037dc6a5cef96327d1c1f2",
-  measurementId: "G-KY2ETBHZ83"
-};
+    apiKey: "AIzaSyCBTE3NoUAMKC8jNIaGF5dCcdWL8kBcFIo",
+    authDomain: "setembro-amarelo-jogo.firebaseapp.com",
+    databaseURL: "https://setembro-amarelo-jogo-default-rtdb.firebaseio.com",
+    projectId: "setembro-amarelo-jogo",
+    storageBucket: "setembro-amarelo-jogo.firebasestorage.app",
+    messagingSenderId: "453358676727",
+    appId: "1:453358676727:web:037dc6a5cef96327d1c1f2",
+    measurementId: "G-KY2ETBHZ83"
+  };
 
-let db = null;
-let firebaseAtivo = false;
+// Inicialização direta e forçada (Garante o funcionamento na nuvem)
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+let firebaseAtivo = true;
+console.log("Firebase forçado com sucesso!");
 
-// Inicialização e testes de conexão
-try {
-    if (typeof firebase !== 'undefined' && firebaseConfig.apiKey && firebaseConfig.apiKey !== "SUA_API_KEY") {
-        firebase.initializeApp(firebaseConfig);
-        db = firebase.firestore();
-        firebaseAtivo = true;
-        console.log("Firebase carregado no script.");
-    }
-} catch (error) {
-    console.error("Erro crítico ao carregar o Firebase:", error);
-}
 
 // Banco de dados de mensagens das bolhas
 const mensagens = [
