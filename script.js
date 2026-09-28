@@ -1,22 +1,24 @@
-// CONFIGURE AQUI: Credenciais oficiais obtidas no console do seu Firebase
+// Importação modular moderna do Firebase (Blindado contra erros de carregamento no HTML)
+import { initializeApp } from "https://gstatic.com";
+import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://gstatic.com";
+
+// Credenciais oficiais do seu projeto Firebase
 const firebaseConfig = {
-  apiKey: "AIzaSyCBTE3NoUAMKC8jNIaGF5dCcdWL8kBcFIo",
-  authDomain: "setembro-amarelo-jogo.firebaseapp.com",
-  databaseURL: "https://setembro-amarelo-jogo-default-rtdb.firebaseio.com",
-  projectId: "setembro-amarelo-jogo",
-  storageBucket: "setembro-amarelo-jogo.firebasestorage.app",
-  messagingSenderId: "453358676727",
-  appId: "1:453358676727:web:037dc6a5cef96327d1c1f2",
-  measurementId: "G-KY2ETBHZ83"
+    apiKey: "AIzaSyCBTE3NoUAMKC8jNIaGF5dCcdwL8kBcFIO",
+    authDomain: "setembro-amarelo-jogo.firebaseapp.com",
+    databaseURL: "https://setembro-amarelo-jogo-default-rtdb.firebaseio.com",
+    projectId: "setembro-amarelo-jogo",
+    storageBucket: "setembro-amarelo-jogo.firebasestorage.app",
+    messagingSenderId: "453358676727",
+    appId: "1:453358676727:web:037dc6a5cef96327d1c1f2",
+    measurementId: "G-KY2ETBHZ83"
 };
 
-// Inicialização direta e forçada (Garante o funcionamento na nuvem)
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-let firebaseAtivo = true;
-console.log("Firebase forçado com sucesso!");
+// Inicialização direta do Banco de Dados
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-// Base de dados de mensagens das bolhas
+// Base de dados das mensagens motivacionais das bolhas
 const mensagens = [
     { text: "Seu esforço nos estudos vai valer a pena. Cada passo conta!", emoji: "📚" },
     { text: "Cuidar da sua mente é um ato de coragem. Você não está sozinho.", emoji: "🧠" },
@@ -35,7 +37,7 @@ const mensagens = [
     { text: "Um dia ruim não significa uma vida ruim. Dias melhores estão vindo.", emoji: "🌤️" }
 ];
 
-const palavrasProibidas = ["palavrao1", "palavrao2", "ofensa1", "ofensa2"];
+const palavrasProibidas = ["palavrao1", "palavrao2"];
 
 let score = 0;
 const gameContainer = document.getElementById('gameContainer');
@@ -46,10 +48,10 @@ const modalMessage = document.getElementById('modalMessage');
 const closeModalBtn = document.getElementById('closeModal');
 const shareBtn = document.getElementById('shareBtn');
 
-// Inicializar elementos da interface
+// Inicialização Geral
 document.addEventListener("DOMContentLoaded", () => {
-    carregarMural();
-    setInterval(createBubble, 1200); // Executa o nascimento das bolhas sem interrupções
+    escutarMuralFirebase();
+    setInterval(createBubble, 1200);
 });
 
 function createBubble() {
@@ -125,7 +127,7 @@ shareBtn.addEventListener('click', async () => {
     }
 });
 
-// --- CONTROLE DE MURAL SEGURO E COLETIVO ---
+// --- OPERAÇÕES NO FIREBASE (MÓDULO v10) ---
 const confessionForm = document.getElementById('confessionForm');
 const confessionInput = document.getElementById('confessionInput');
 const mural = document.getElementById('mural');
@@ -135,26 +137,19 @@ if (confessionForm) {
         e.preventDefault();
         let texto = confessionInput.value.trim();
         
-        if (texto !== "") {
+        if(texto !== "") {
             texto = filtrarTexto(texto);
             confessionInput.value = ""; 
             
-            // Grava e exibe no navegador local imediatamente
-            let desabafosLocais = JSON.parse(localStorage.getItem('backup_desabafos')) || [];
-            desabafosLocais.unshift(texto);
-            localStorage.setItem('backup_desabafos', JSON.stringify(desabafosLocais));
-            renderizarMural(desabafosLocais);
-            
-            // Envia em background para a nuvem global se o Firebase estiver operacional
-            if (firebaseAtivo && db) {
-                try {
-                    await db.collection("desabafos").add({
-                        texto: texto,
-                        criadoEm: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                } catch (error) {
-                    console.error("Erro ao transmitir para a nuvem:", error);
-                }
+            try {
+                // Salvando na coleção "desabafos" na nuvem
+                await addDoc(collection(db, "desabafos"), {
+                    texto: texto,
+                    criadoEm: serverTimestamp()
+                });
+            } catch (error) {
+                console.error("Erro ao enviar para o Firebase: ", error);
+                alert("O banco recusou o envio. Verifique se as Regras de Segurança no Cloud Firestore estão como true.");
             }
         }
     });
@@ -169,44 +164,36 @@ function filtrarTexto(texto) {
     return textoFiltrado;
 }
 
-function carregarMural() {
-    let locais = JSON.parse(localStorage.getItem('backup_desabafos')) || [];
+// Escuta em tempo real as mensagens globais de todos os computadores
+function escutarMuralFirebase() {
+    const q = query(collection(db, "desabafos"), orderBy("criadoEm", "desc"));
     
-    if (locais.length === 0) {
-        locais = [
-            "Às vezes sinto que a pressão dos estudos é demais para mim, mas estou tentando ir com calma.",
-            "Guardar as coisas só para mim estava me sufocando. Deixar esse recado aqui me deu um pequeno alívio."
-        ];
-    }
-    
-    renderizarMural(locais);
+    onSnapshot(q, (snapshot) => {
+        if (!mural) return;
+        mural.innerHTML = ""; 
+        
+        if (snapshot.empty) {
+            mural.innerHTML = `
+                <div class="card-desabafo">"Mural conectado com sucesso! Seja o primeiro a deixar um desabafo anônimo global..."</div>
+                <div class="card-desabafo">"Guardar tudo para si sufoca. Sinta-se livre para desabafar aqui."</div>
+            `;
+            return;
+        }
 
-    // Escuta ativa do Firebase clássico v8
-    if (firebaseAtivo && db) {
-        db.collection("desabafos").orderBy("criadoEm", "desc").onSnapshot((snapshot) => {
-            let globais = [];
-            snapshot.forEach((doc) => {
-                const dados = doc.data();
-                if (dados.texto) globais.push(dados.texto);
-            });
-            
-            if (globais.length > 0) {
-                let unificados = [...new Set([...locais, ...globais])];
-                renderizarMural(unificados);
+        snapshot.forEach((doc) => {
+            const dados = doc.data();
+            if (dados.texto) {
+                const card = document.createElement('div');
+                card.classList.add('card-desabafo');
+                card.innerText = `"${dados.texto}"`;
+                mural.appendChild(card);
             }
-        }, (error) => {
-            console.error("Erro de sincronização externa:", error);
         });
-    }
-}
-
-function renderizarMural(lista) {
-    if (!mural) return;
-    mural.innerHTML = "";
-    lista.forEach(texto => {
-        const card = document.createElement('div');
-        card.classList.add('card-desabafo');
-        card.innerText = `"${texto}"`;
-        mural.appendChild(card);
+    }, (error) => {
+        console.error("Erro ao ler dados do Firebase: ", error);
+        mural.innerHTML = `
+            <div class="card-desabafo" style="color: #dc2626; border-left-color: #dc2626;">
+                ❌ Erro de Permissão nas Regras do Cloud Firestore. Acesse seu painel do Firebase > Cloud Firestore > aba Regras, mude para true e clique em Publicar.
+            </div>`;
     });
 }
