@@ -1,4 +1,4 @@
-// 🔑 COLOQUE SUAS CREDENCIAIS DO FIREBASE AQUI DENTRO:
+// COLOQUE SUAS CREDENCIAIS DO FIREBASE AQUI DENTRO:
 const firebaseConfig = {
   apiKey: "AIzaSyCBTE3NoUAMKC8jNIaGF5dCcdWL8kBcFIo",
   authDomain: "setembro-amarelo-jogo.firebaseapp.com",
