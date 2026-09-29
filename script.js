@@ -1,17 +1,17 @@
-// URLs oficiais e completas corrigidas contra erros de CORS
+// Importações oficiais e completas com a versão estável do Firebase Web SDK
 import { initializeApp } from "https://gstatic.com";
 import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://gstatic.com";
 
-// SUAS CREDENCIAIS OFICIAIS ATIVADAS
+// Suas credenciais oficiais do projeto Firebase
 const firebaseConfig = {
-  apiKey: "AIzaSyCBTE3NoUAMKC8jNIaGF5dCcdWL8kBcFIo",
-  authDomain: "setembro-amarelo-jogo.firebaseapp.com",
-  databaseURL: "https://setembro-amarelo-jogo-default-rtdb.firebaseio.com",
-  projectId: "setembro-amarelo-jogo",
-  storageBucket: "setembro-amarelo-jogo.firebasestorage.app",
-  messagingSenderId: "453358676727",
-  appId: "1:453358676727:web:037dc6a5cef96327d1c1f2",
-  measurementId: "G-KY2ETBHZ83"
+    apiKey: "AIzaSyCBTE3NoUAMKC8jNIaGF5dCcdWL8kBcFIo",
+    authDomain: "://firebaseapp.com",
+    databaseURL: "https://firebaseio.com",
+    projectId: "setembro-amarelo-jogo",
+    storageBucket: "setembro-amarelo-jogo.firebasestorage.app",
+    messagingSenderId: "453358676727",
+    appId: "1:453358676727:web:037dc6a5cef96327d1c1f2",
+    measurementId: "G-KY2ETBHZ83"
 };
 
 // Inicialização direta do Cloud Firestore
@@ -48,7 +48,7 @@ const modalMessage = document.getElementById('modalMessage');
 const closeModalBtn = document.getElementById('closeModal');
 const shareBtn = document.getElementById('shareBtn');
 
-// Inicialização Geral
+// Inicialização Geral do Jogo
 document.addEventListener("DOMContentLoaded", () => {
     escutarMuralFirebase();
     setInterval(createBubble, 1200);
@@ -188,8 +188,9 @@ function escutarMuralFirebase() {
     }, (error) => {
         console.error("Erro ao ler dados do Firebase: ", error);
         mural.innerHTML = `
-            <div class="card-desabafo" style="color: #dc2626; border-left-color: #dc2626;">
-                ❌ Erro de Permissão nas Regras do Cloud Firestore. Acesse seu painel do Firebase > Cloud Firestore > aba Regras, mude para true e clique em Publicar.
+            <div class="card-desabafo" style="color: #dc2626; border-left-color: #dc2626; font-weight: bold;">
+                ❌ Erro de Permissão nas Regras do Cloud Firestore.<br>
+                <span style="font-size: 0.9rem; font-weight: normal; color: #451a03;">Acesse o painel do seu Firebase > Cloud Firestore > aba Regras, mude "allow read, write: if false;" para "true" e clique em Publicar.</span>
             </div>`;
     });
 }
