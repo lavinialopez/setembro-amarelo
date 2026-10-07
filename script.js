@@ -5,16 +5,16 @@ import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTim
 // Suas credenciais oficiais do projeto Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyCBTE3NoUAMKC8jNIaGF5dCcdWL8kBcFIo",
-    authDomain: "://firebaseapp.com",
-    databaseURL: "https://firebaseio.com",
+    authDomain: "setembro-amarelo-jogo.firebaseapp.com",
+    databaseURL: "https://setembro-amarelo-jogo-default-rtdb.firebaseio.com",
     projectId: "setembro-amarelo-jogo",
     storageBucket: "setembro-amarelo-jogo.firebasestorage.app",
     messagingSenderId: "453358676727",
     appId: "1:453358676727:web:037dc6a5cef96327d1c1f2",
     measurementId: "G-KY2ETBHZ83"
-};
+  };
 
-// Inicialização direta do Cloud Firestore
+// Inicialização segura do Cloud Firestore
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
@@ -65,12 +65,12 @@ function createBubble() {
     const size = Math.random() * 20 + 55;
     const posX = Math.random() * (window.innerWidth - size - 40);
     
-    bubble.style.width = `${size}px`;
-    bubble.style.height = `${size}px`;
-    bubble.style.left = `${posX}px`;
+    bubble.style.width = size + "px";
+    bubble.style.height = size + "px";
+    bubble.style.left = posX + "px";
     
     const duration = Math.random() * 3 + 5;
-    bubble.style.animationDuration = `${duration}s`;
+    bubble.style.animationDuration = duration + "s";
     
     bubble.addEventListener('click', (e) => {
         createBurstAnimation(e.clientX, e.clientY);
@@ -87,15 +87,15 @@ function createBurstAnimation(x, y) {
     for (let i = 0; i < particleCount; i++) {
         const particle = document.createElement('div');
         particle.classList.add('particle');
-        particle.style.left = `${x}px`;
-        particle.style.top = `${y}px`;
+        particle.style.left = x + "px";
+        particle.style.top = y + "px";
         const pSize = Math.random() * 6 + 4;
-        particle.style.width = `${pSize}px`;
-        particle.style.height = `${pSize}px`;
+        particle.style.width = pSize + "px";
+        particle.style.height = pSize + "px";
         const angle = Math.random() * Math.PI * 2;
         const velocity = Math.random() * 60 + 40;
-        particle.style.setProperty('--mx', `${Math.cos(angle) * velocity}px`);
-        particle.style.setProperty('--my', `${Math.sin(angle) * velocity}px`);
+        particle.style.setProperty('--mx', (Math.cos(angle) * velocity) + "px");
+        particle.style.setProperty('--my', (Math.sin(angle) * velocity) + "px");
         document.body.appendChild(particle);
         setTimeout(() => { particle.remove(); }, 500);
     }
@@ -126,7 +126,7 @@ shareBtn.addEventListener('click', async () => {
     }
 });
 
-// --- OPERAÇÕES NO FIREBASE ---
+// --- OPERAÇÕES DO FIREBASE ---
 const confessionForm = document.getElementById('confessionForm');
 const confessionInput = document.getElementById('confessionInput');
 const mural = document.getElementById('mural');
@@ -136,7 +136,7 @@ if (confessionForm) {
         e.preventDefault();
         let texto = confessionInput.value.trim();
         
-        if(texto !== "") {
+        if (texto !== "") {
             texto = filtrarTexto(texto);
             confessionInput.value = ""; 
             
@@ -155,7 +155,7 @@ if (confessionForm) {
 function filtrarTexto(texto) {
     let textoFiltrado = texto;
     palavrasProibidas.forEach(palavra => {
-        const regex = new RegExp(`\\b${palavra}\\b`, 'gi');
+        const regex = new RegExp("\\b" + palavra + "\\b", 'gi');
         textoFiltrado = textoFiltrado.replace(regex, "*".repeat(palavra.length));
     });
     return textoFiltrado;
@@ -181,7 +181,7 @@ function escutarMuralFirebase() {
             if (dados.texto) {
                 const card = document.createElement('div');
                 card.classList.add('card-desabafo');
-                card.innerText = `"${dados.texto}"`;
+                card.innerText = '"' + dados.texto + '"';
                 mural.appendChild(card);
             }
         });
